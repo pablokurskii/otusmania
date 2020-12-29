@@ -1,2 +1,3 @@
+rootProject.name = 'otusMania'
 include 'hw01-gradle'
 
