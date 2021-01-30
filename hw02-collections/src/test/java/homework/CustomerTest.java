@@ -11,7 +11,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class CustomerTest {
 
-    // Все тесты должны проходить, менять тесты не надо.
 
     @Test
     @DisplayName("Объект Customer как ключ в карте")
@@ -81,6 +80,9 @@ class CustomerTest {
     @DisplayName("Модификация коллекции")
     void mutationTest() {
         //given
+        /*
+        * The point is to recreate hash by customer id for every getSmallest
+        * */
         Customer customer1 = new Customer(1, "Ivan", 233);
         Customer customer2 = new Customer(2, "Petr", 11);
         Customer customer3 = new Customer(3, "Pavel", 888);
