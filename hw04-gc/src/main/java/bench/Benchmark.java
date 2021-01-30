@@ -6,7 +6,6 @@ class Benchmark implements BenchmarkMBean {
     private final int loopCounter;
     private volatile int size = 0;
 
-
     public Benchmark(int loopCounter) {
         this.loopCounter = loopCounter;
     }
