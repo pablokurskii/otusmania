@@ -25,7 +25,6 @@ public class GcTester {
 
         int size = 5_000_000;
         int loopCounter = 1000;
-        //int loopCounter = 100000;
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         ObjectName name = new ObjectName("ru.otus:type=Benchmark");
 
@@ -56,7 +55,6 @@ public class GcTester {
                     long startTime = info.getGcInfo().getStartTime();
                     long duration = info.getGcInfo().getDuration();
 
-                    /*EVERY PRINT*/
                     collector.compute(gcName, (name, timesProcessed) -> (timesProcessed == null) ? 1 : timesProcessed+1);
                     System.out.println("start:" + startTime + " Name:" + gcName + ", action:" + gcAction + ", gcCause:" + gcCause + "(" + duration + " ms)");
                 }
