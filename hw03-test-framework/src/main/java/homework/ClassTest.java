@@ -17,12 +17,15 @@ public class ClassTest {
     }
     @After
     public void after1() {
+
     }
 
     @Test
     public void test2() {
-
+        throw new RuntimeException();
     }
 
-
+    @After
+    public void after2() {
+    }
 }

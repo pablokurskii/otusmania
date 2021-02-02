@@ -2,37 +2,76 @@ package homework;
 
 import homework.annotations.After;
 import homework.annotations.Before;
-import homework.annotations.Test;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class TestRunner {
 
-    private final Class<ClassTest> testClass;
+    private final Class<ClassTest> classTest;
 
-    public TestRunner(Class<ClassTest> testClass) {
-        this.testClass = testClass;
+    public TestRunner(Class<ClassTest> classTest) {
+        this.classTest = classTest;
     }
 
-    public void run(){
+    public List<TestExecutionResultDetails> run() {
         try {
-            for (Method method : testClass.getDeclaredMethods()) {
-                if (method.isAnnotationPresent(Before.class)){
+//            for (Method method : classTest.getDeclaredMethods()) {
+                Object instance = classTest.getDeclaredConstructor().newInstance();
 
-                }
-                else if (method.isAnnotationPresent(Test.class)) {
-                    method.invoke(testClass);
-                }
-                else if (method.isAnnotationPresent(After.class)) {
-                    method.invoke(testClass);
-                }
-            }
+                runBeforeTest(instance);
+                TestExecutionResultDetails testExecutionResultDetails = runTest(method,instance);
+                runAfterTest(instance);
+
+//            }
+        } catch (ReflectiveOperationException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return null;
+
+    }
+
+    private void runBeforeTest(Object instance) {
+        scrapMethodsWith(Before.class).forEach(method -> exec(method, instance));
+    }
+
+    private TestExecutionResultDetails runTest(Method method, Object instance) {
+        try {
+            System.out.printf("exec %s test\n", method.getName());
+            method.invoke(instance);
+            return null;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            return null;
         }
     }
 
-    private void setUp(Object instance){
-        scrapMethodsWith(Before.class).forEach(method -> exec(method, instance));
+    private void runAfterTest(Object instance) {
+        scrapMethodsWith(After.class).forEach(method -> exec(method, instance));
+    }
+
+    private List<Method> scrapMethodsWith(Class<? extends Annotation> annotation) {
+        List<Method> declaredMethods = new ArrayList<>();
+        for (Method declaredMethod : classTest.getDeclaredMethods()) {
+            if (declaredMethod.isAnnotationPresent(annotation)){
+                declaredMethods.add(declaredMethod);
+            }
+        }
+        return declaredMethods;
+    }
+
+    private void exec(Method method, Object instance) {
+        try {
+            System.out.printf("exec %s method\n", method.getName());
+            method.invoke(instance);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }
