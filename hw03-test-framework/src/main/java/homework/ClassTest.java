@@ -12,17 +12,16 @@ public class ClassTest {
     }
 
     @Test
-    public void test1() {
-
+    public void test1() throws Exception {
+        throw new Exception();
     }
+
     @After
     public void after1() {
-
     }
 
     @Test
     public void test2() {
-        throw new RuntimeException();
     }
 
     @After
