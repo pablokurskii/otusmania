@@ -34,10 +34,11 @@ public class GcTester {
         try {
             mbean.run();
         } catch (OutOfMemoryError E) {
-            System.out.println("Execution time: " + (System.currentTimeMillis() - beginTime) / 1000 + " sec");
+            long duration = (System.currentTimeMillis() - beginTime) / 1000;
+            System.out.println("Execution time: " + duration + " sec");
             collector.forEach((gcName, timesProcessed) -> {
                 System.out.println("Garbage Collector " + gcName + " processed " + timesProcessed + " times.");
-                System.out.println("Processing speed " + timesProcessed  + " times/sec");
+                System.out.println("Processing speed " + timesProcessed * 60 / duration  + " times/min");
             });
         }
     }

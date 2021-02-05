@@ -1,10 +1,3 @@
-# VM Options чтобы получить OOM
-> -Xms512m<br>
--Xmx512m<br>
--XX:+HeapDumpOnOutOfMemoryError<br>
--<u>XX:+UnlockExperimentalVMOptions<br>
--XX:+UseEpsilonGC</u>
-
 # VM Options для тестов GC
 
 > -Xms512m<br>
@@ -28,32 +21,43 @@ G1 | -XX:+UseG1GC
 ## Показания
 
 ### Serial Collector
-Execution time: 33 sec<br>
-Garbage Collector Copy processed 999 times.<br>
-Processing speed 16 times/min<br>
-Garbage Collector MarkSweepCompact processed 5 times.<br>
-Processing speed 0 times/min
+Execution time: 139 sec<br>
+Garbage Collector Copy processed 44 times.<br>
+Processing speed 18 times/min<br>
+Garbage Collector MarkSweepCompact processed 140 times.<br>
+Processing speed 60 times/min
 
 ### Parallel Collector
-Execution time: 529 sec<br>
-Garbage Collector PS MarkSweep processed 499 times.<br>
-Processing speed 8 times/min<br>
-Garbage Collector PS Scavenge processed 2327 times.<br>
-Processing speed 38 times/min
+Execution time: 76 sec<br>
+Garbage Collector PS MarkSweep processed 77 times.<br>
+Processing speed 60 times/min<br>
+Garbage Collector PS Scavenge processed 50 times.<br>
+Processing speed 39 times/min
 
 ### CMS
-Execution time: 34 sec<br>
-Garbage Collector ParNew processed 999 times.<br>
-Processing speed 16 times/min<br>
-Garbage Collector ConcurrentMarkSweep processed 5 times.<br>
-Processing speed 0 times/min
+Execution time: 98 sec<br>
+Garbage Collector ParNew processed 52 times<br>
+Processing speed 31 times/min<br>
+Garbage Collector ConcurrentMarkSweep processed 84 times.<br>
+Processing speed 51 times/min
 
 ### G1
-Execution time: 82 sec<br>
-Garbage Collector G1 Young Generation processed 1623 times.<br>
-Processing speed 27 times/min<br>
-Garbage Collector G1 Old Generation processed 4 times.<br>
-Processing speed 0 times/min
+Execution time: 65 sec<br>
+Garbage Collector G1 Young Generation processed 201 times.<br>
+Processing speed 185 times/min<br>
+Garbage Collector G1 Old Generation processed 26 times.<br>
+Processing speed 24 times/min
+
+## Показатели Full gc pauses
+Данные указаны в секундах.
+
+| GC  | min  | avg  | max | total 
+|---|---|---|---|---|
+Serial Collector | 0.05862 | 0.38327 | 0.4835 | 75.12
+Parallel Collector | 0.02074 | 0.21167 | 0.44827 | 17.78
+CMS | 0.16412 | 0.48366 | 0.65951 | 35.31
+G1 | 0.10947 | 0.1243 | 0.17269| 3.23
+
 
 ## Комментарии
 
