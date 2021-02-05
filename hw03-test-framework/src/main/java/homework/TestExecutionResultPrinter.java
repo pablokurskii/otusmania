@@ -6,8 +6,8 @@ import java.util.List;
  * Generates output report of Test execution result details
  */
 
-public class Stats {
-    public void get(List<TestExecutionResultDetails> testExecutionResultDetails) {
+public class TestExecutionResultPrinter {
+    public void print(List<TestExecutionResultDetails> testExecutionResultDetails) {
         int testsQty = testExecutionResultDetails.size();
         long passedTestsQty = testExecutionResultDetails.stream()
                 .filter(result -> result.getResult().equals("Passed"))
@@ -26,7 +26,7 @@ public class Stats {
     }
 
     private void printDetails(TestExecutionResultDetails testExecutionResultDetails) {
-        System.out.printf("Test %s failed with reason: %s\n",testExecutionResultDetails.method,
+        System.out.printf("Test %s failed with reason: %s\n",testExecutionResultDetails.getMethod(),
                 testExecutionResultDetails.getDetails());
     }
 

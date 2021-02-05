@@ -8,7 +8,7 @@ import homework.annotations.Test;
 public class ClassTest {
 
     @Before
-    public void before1() {
+    public void beforeEachTest() {
     }
 
     @Test
@@ -17,14 +17,10 @@ public class ClassTest {
     }
 
     @After
-    public void after1() {
+    public void afterEachTest() {
     }
 
     @Test
     public void test2() {
-    }
-
-    @After
-    public void after2() {
     }
 }
