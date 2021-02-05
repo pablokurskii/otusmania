@@ -1,6 +1,8 @@
 package bench;
 
 
+import java.util.ArrayList;
+import java.util.Properties;
 
 class Benchmark implements BenchmarkMBean {
     private final int loopCounter;
@@ -10,70 +12,36 @@ class Benchmark implements BenchmarkMBean {
         this.loopCounter = loopCounter;
     }
 
-    void run() throws InterruptedException {
-        for (int i = 0; i < loopCounter; i++) {
-            for (int j = 0; j < 50; j++) {
-              GrandPa grandPa = new GrandPa(size*11);
-              Pa pa = new Pa(size*16);
-              YoungOne youngOne = new YoungOne();
-
-              pa.father = grandPa;
-              youngOne.father = pa;
-
-              youngOne.father.fatherPassedAway();
-
-              youngOne.money = youngOne.father.money;
-              youngOne.father.money = new String[100];
-              youngOne.growUp();
-//              Thread.sleep(10);
-                for (int idx = 0; idx < loopCounter; idx++) {
-                    int local = size;
-                    Object[] array = new Object[local];
-                    Object[] array2 = new Object[local];
-                    for (int k = 0; k < local; k++) {
-                        array[k] = new String(new char[48]);
-                        array2[k] = array;
+    void run() {
+        long count = 0;
+        try {
+            ArrayList<myClass> stuff = new ArrayList<>();
+            while (count < size) {
+                count++;
+                myClass p = new myClass();
+                p.put("title", "Title #" + count);
+                stuff.add(p);
+                if ((count % (size / 100)) == 0) {
+                    for (int idx = 0; idx < loopCounter; idx++) {
+                        Object[] array = new Object[size/100];
+                        for (int i = 0; i < loopCounter; i++) {
+                            array[i] = new String(new char[0]);
+                        }
                     }
-//                Thread.sleep(10); //Label_1
+                    System.out.println("Total elements saved = " + stuff.size() + " - " + (((count * 100) / size)) + "% done");
+                    Thread.sleep(1000);
                 }
             }
-
-
-
-            System.out.println(i);
-
+            System.out.println("Done!");
+        } catch (Exception e) {
+            System.out.println("Exception at count" + count);
         }
 
     }
 
-    static class GrandPa{
-        private final String[] money;
-
-        public GrandPa(int money) {
-            this.money = new String[money];
-        }
-    }
-
-    static class Pa{
-        private GrandPa father;
-        private String[] money;
-
-        public Pa(int money) {
-            this.money = new String[money];
-        }
-
-        void fatherPassedAway(){
-            money = father.money;
-            father = null;
-        }
-    }
-
-    static class YoungOne{
-        public String[] money;
-        private Pa father;
-        void growUp(){
-            money = father.money;
-            father = null;
+    public class myClass extends Properties {
+        myClass() {
+            super();
         }
     }
 
@@ -87,5 +55,4 @@ class Benchmark implements BenchmarkMBean {
         System.out.println("new size:" + size);
         this.size = size;
     }
-
 }

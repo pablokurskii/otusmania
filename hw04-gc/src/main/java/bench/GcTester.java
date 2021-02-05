@@ -23,7 +23,7 @@ public class GcTester {
         switchOnMonitoring();
         long beginTime = System.currentTimeMillis();
 
-        int size = 5_000_000;
+        int size = 3_000_000;
         int loopCounter = 1000;
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         ObjectName name = new ObjectName("ru.otus:type=Benchmark");
@@ -31,13 +31,15 @@ public class GcTester {
         Benchmark mbean = new Benchmark(loopCounter);
         mbs.registerMBean(mbean, name);
         mbean.setSize(size);
-        mbean.run();
-
-        System.out.println("Execution time: " + (System.currentTimeMillis() - beginTime) / 1000 + " sec");
-        collector.forEach((gcName,timesProcessed) -> {
-                    System.out.println("Garbage Collector "+ gcName + " processed "+ timesProcessed + " times.");
-                    System.out.println("Processing speed "+ timesProcessed/60 + " times/min");
-                });
+        try {
+            mbean.run();
+        } catch (OutOfMemoryError E) {
+            System.out.println("Execution time: " + (System.currentTimeMillis() - beginTime) / 1000 + " sec");
+            collector.forEach((gcName, timesProcessed) -> {
+                System.out.println("Garbage Collector " + gcName + " processed " + timesProcessed + " times.");
+                System.out.println("Processing speed " + timesProcessed  + " times/sec");
+            });
+        }
     }
 
     private static void switchOnMonitoring() {
@@ -55,7 +57,7 @@ public class GcTester {
                     long startTime = info.getGcInfo().getStartTime();
                     long duration = info.getGcInfo().getDuration();
 
-                    collector.compute(gcName, (name, timesProcessed) -> (timesProcessed == null) ? 1 : timesProcessed+1);
+                    collector.compute(gcName, (name, timesProcessed) -> (timesProcessed == null) ? 1 : timesProcessed + 1);
                     System.out.println("start:" + startTime + " Name:" + gcName + ", action:" + gcAction + ", gcCause:" + gcCause + "(" + duration + " ms)");
                 }
             };
