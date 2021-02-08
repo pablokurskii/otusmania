@@ -13,7 +13,11 @@ public class ClassTest {
 
     @Test
     public void test1() throws Exception {
-        throw new Exception();
+        try{
+            int zero = 5/0;
+        }catch (ArithmeticException e){
+           throw new Exception(e);
+        }
     }
 
     @After

@@ -13,7 +13,8 @@ public class TestRunner {
 
     private final Class<ClassTest> classTest;
 
-    private Object classTestInstance;
+    private List<Method> beforeMethods;
+    private List<Method> afterMethods;
 
     public TestRunner(Class<ClassTest> classTest) {
         this.classTest = classTest;
@@ -23,18 +24,34 @@ public class TestRunner {
 
         List<TestExecutionResultDetails> results = new ArrayList<>();
 
+        beforeMethods = scrapMethodsWith(Before.class);
+        afterMethods = scrapMethodsWith(After.class);
         scrapMethodsWith(Test.class).forEach(method -> results.add(runTest(method)));
 
         return results;
 
     }
 
-    private void runBeforeTest(Object instance) {
-        scrapMethodsWith(Before.class).forEach(method -> exec(method, instance));
+    private void runBeforeTest(Object instance) throws Exception {
+        for (Method method : beforeMethods) {
+            try {
+                exec(method, instance);
+            } catch (Exception e) {
+                System.out.printf("Failed startup %s method\n", method.getName());
+                throw new Exception(e);
+            }
+        }
     }
 
-    private void runAfterTest(Object instance) {
-        scrapMethodsWith(After.class).forEach(method -> exec(method, instance));
+    private void runAfterTest(Object instance) throws Exception {
+        for (Method method : afterMethods) {
+            try {
+                exec(method, instance);
+            } catch (Exception e) {
+                System.out.printf("Failed teardown %s method\n", method.getName());
+                throw new Exception(e);
+            }
+        }
     }
 
     private List<Method> scrapMethodsWith(Class<? extends Annotation> annotation) {
@@ -50,32 +67,30 @@ public class TestRunner {
     private TestExecutionResultDetails runTest(Method method) {
 
         try {
-            classTestInstance = classTest.getDeclaredConstructor().newInstance();
+            Object classTestInstance = classTest.getDeclaredConstructor().newInstance();
 
-            System.out.printf("Startup\n", method.getName());
+            System.out.println("Startup");
             runBeforeTest(classTestInstance);
 
             System.out.printf("Executing %s test\n", method.getName());
             method.invoke(classTestInstance);
 
-            System.out.printf("Teardown\n", method.getName());
+            System.out.println("Teardown");
             runAfterTest(classTestInstance);
 
             return new TestExecutionResultDetails(method.getName(), "Passed", "Success");
         } catch (Exception e) {
-            System.out.printf("Teardown %s test with exception\n", method.getName());
-            runAfterTest(classTestInstance);
-
+            System.out.printf("Failed executing %s test\n", method.getName());
             return new TestExecutionResultDetails(method.getName(), "Failed", e.getCause().toString());
         }
     }
 
-    private void exec(Method method, Object instance) {
+    private void exec(Method method, Object instance) throws Exception {
         try {
             System.out.printf("Executing %s method\n", method.getName());
             method.invoke(instance);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new Exception("Failed executing method "+method.getName(), e);
         }
 
     }
