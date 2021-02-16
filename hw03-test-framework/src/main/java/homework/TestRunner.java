@@ -13,41 +13,45 @@ public class TestRunner {
 
     private final Class<ClassTest> classTest;
 
+    private List<Method> beforeMethods;
+    private List<Method> afterMethods;
+
     public TestRunner(Class<ClassTest> classTest) {
         this.classTest = classTest;
     }
 
     public List<TestExecutionResultDetails> run() {
-        try {
-            Object instanceBefore = classTest.getDeclaredConstructor().newInstance();
-            runBeforeTest(instanceBefore);
 
-            Object instanceTest = classTest.getDeclaredConstructor().newInstance();
-            List<TestExecutionResultDetails> results = runTests(instanceTest);
-
-            Object instanceAfter = classTest.getDeclaredConstructor().newInstance();
-            runAfterTest(instanceAfter);
-
-            return results;
-        } catch (ReflectiveOperationException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-    }
-
-    private void runBeforeTest(Object instance) {
-        scrapMethodsWith(Before.class).forEach(method -> exec(method, instance));
-    }
-
-    private List<TestExecutionResultDetails> runTests(Object instance) {
         List<TestExecutionResultDetails> results = new ArrayList<>();
-        scrapMethodsWith(Test.class).forEach(method -> results.add(runTest(method, instance)));
+
+        beforeMethods = scrapMethodsWith(Before.class);
+        afterMethods = scrapMethodsWith(After.class);
+        scrapMethodsWith(Test.class).forEach(method -> results.add(runTest(method)));
+
         return results;
+
     }
 
-    private void runAfterTest(Object instance) {
-        scrapMethodsWith(After.class).forEach(method -> exec(method, instance));
+    private void runBeforeTest(Object instance) throws Exception {
+        for (Method method : beforeMethods) {
+            try {
+                exec(method, instance);
+            } catch (Exception e) {
+                System.out.printf("Failed startup %s method\n", method.getName());
+                throw new Exception(e);
+            }
+        }
+    }
+
+    private void runAfterTest(Object instance) throws Exception {
+        for (Method method : afterMethods) {
+            try {
+                exec(method, instance);
+            } catch (Exception e) {
+                System.out.printf("Failed teardown %s method\n", method.getName());
+                throw new Exception(e);
+            }
+        }
     }
 
     private List<Method> scrapMethodsWith(Class<? extends Annotation> annotation) {
@@ -60,22 +64,33 @@ public class TestRunner {
         return declaredMethods;
     }
 
-    private TestExecutionResultDetails runTest(Method method, Object instance) {
+    private TestExecutionResultDetails runTest(Method method) {
+
         try {
-            System.out.printf("Running %s test\n", method.getName());
-            method.invoke(instance);
+            Object classTestInstance = classTest.getDeclaredConstructor().newInstance();
+
+            System.out.println("Startup");
+            runBeforeTest(classTestInstance);
+
+            System.out.printf("Executing %s test\n", method.getName());
+            method.invoke(classTestInstance);
+
+            System.out.println("Teardown");
+            runAfterTest(classTestInstance);
+
             return new TestExecutionResultDetails(method.getName(), "Passed", "Success");
         } catch (Exception e) {
+            System.out.printf("Failed executing %s test\n", method.getName());
             return new TestExecutionResultDetails(method.getName(), "Failed", e.getCause().toString());
         }
     }
 
-    private void exec(Method method, Object instance) {
+    private void exec(Method method, Object instance) throws Exception {
         try {
-            System.out.printf("Running %s method\n", method.getName());
+            System.out.printf("Executing %s method\n", method.getName());
             method.invoke(instance);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new Exception("Failed executing method "+method.getName(), e);
         }
 
     }
