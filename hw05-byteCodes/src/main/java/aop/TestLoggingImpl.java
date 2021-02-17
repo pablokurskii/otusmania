@@ -18,4 +18,9 @@ public class TestLoggingImpl implements TestLogging {
     public void calculation(int param1, int param2, String param3) {
         System.out.println("Hello " + param1 + ", " + param2 + ", " + param3);
     }
+
+    @Override
+    public void calculation(int param1, char param2, Boolean param3) {
+        System.out.println("Hello " + param1 + ", " + param2 + ", " + param3);
+    }
 }

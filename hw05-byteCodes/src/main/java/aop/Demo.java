@@ -6,5 +6,6 @@ public class Demo {
         testLogging.calculation(6);
         testLogging.calculation(6, 4);
         testLogging.calculation(6, 2, "Algo más");
+        testLogging.calculation(6, '%', false);
     }
 }
