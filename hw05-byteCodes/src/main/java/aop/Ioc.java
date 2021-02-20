@@ -25,28 +25,25 @@ class Ioc {
 
     static class DemoInvocationHandler implements InvocationHandler {
 
-        private final TestLogging testLogging;
+        private final TestLoggingImpl testLoggingImpl;
         private final List<?> logMethods;
 
-        DemoInvocationHandler(TestLogging testLogging) {
-            this.testLogging = testLogging;
+        DemoInvocationHandler(TestLoggingImpl testLoggingImpl) {
+            this.testLoggingImpl = testLoggingImpl;
             this.logMethods = scrapMethodsWith(Log.class);
-            logMethods.forEach(System.out::println);
         }
 
         private boolean requiresLogging(Method method) {
             String methodModifiers = Modifier.toString(method.getModifiers());
             String returnType = method.getReturnType().getName();
             String methodName = method.getName();
-            String fullSignature = methodModifiers + " " + returnType + " " + methodName;
-            System.out.println(fullSignature);
-//            System.out.println("requiresLogging "+method.toString());
-//            String signature = method.getName()+"(";
-            /*Arrays.stream(method.getParameterTypes())
-                    .forEach(type -> {
-                         signature+=type.toString();
-                    });*/
-//            System.out.println(signature.toString());
+            String parameterTypes = Arrays.toString(method.getParameterTypes());
+            String fullSignature = methodModifiers + " " + returnType + " " + methodName + " " + parameterTypes;
+
+//            System.out.println(fullSignature);
+            System.out.println("requiresLogging "+method.toString());
+
+
 //            System.out.println(logMethods.contains(signature.toString()));
             return false;
         }
@@ -54,7 +51,7 @@ class Ioc {
         private List<Method> scrapMethodsWith(Class<? extends Annotation> annotation) {
 
             List<Method> declaredMethods = new ArrayList<>();
-            for (Method declaredMethod : testLogging.getClass().getDeclaredMethods()) {
+            for (Method declaredMethod : testLoggingImpl.getClass().getDeclaredMethods()) {
                 if (declaredMethod.isAnnotationPresent(annotation)) {
                     declaredMethods.add(declaredMethod);
                     System.out.println("scrapMethodsWith " + declaredMethod.toString());
@@ -79,7 +76,7 @@ class Ioc {
                 System.out.printf("executed method: %s, %s\n", methodName, sb.toString());
             }
 
-            return method.invoke(testLogging, args);
+            return method.invoke(testLoggingImpl, args);
         }
     }
 
