@@ -1,22 +1,30 @@
 package main;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class AtmTest {
-    @Test
-    @DisplayName("Top up account")
-    void topUpAccount(){
-        //given
-        Atm atm = new Atm();
-        Banknotes banknotes = new Banknotes();
+
+    private Atm atm;
+    private Banknotes banknotes;
+
+    @BeforeEach
+    void setUp(){
+        atm = new Atm();
+        banknotes = new Banknotes();
 
         banknotes.setCash(Nominal.FIFTY, 2);
         banknotes.setCash(Nominal.ONE_THOUSAND, 5);
         banknotes.setCash(Nominal.TWO_HUNDRED, 8);
+        banknotes.countCash();
+    }
 
+    @Test
+    @DisplayName("Top up account")
+    void topUpAccount(){
         //when
         atm.insertNotes(banknotes);
 
@@ -26,16 +34,8 @@ class AtmTest {
 
     @Test
     @DisplayName("Withdraw amount by nominal from account")
-    void withdrawAmountFromAccount(){
+    void withdrawAmountByNominalFromAccount(){
         //given
-        Atm atm = new Atm();
-        Banknotes banknotes = new Banknotes();
-
-        banknotes.setCash(Nominal.ONE_THOUSAND, 5);
-        banknotes.setCash(Nominal.TWO_HUNDRED, 8);
-        banknotes.setCash(Nominal.FIFTY, 2);
-        banknotes.countCash();
-
         atm.insertNotes(banknotes);
         //when
         int withdrawAmount = 5000;
@@ -64,13 +64,6 @@ class AtmTest {
     @DisplayName("Withdraw from account")
     void withdrawFromAccount(){
         //given
-        Atm atm = new Atm();
-        Banknotes banknotes = new Banknotes();
-
-        banknotes.setCash(Nominal.FIFTY, 2);
-        banknotes.setCash(Nominal.ONE_THOUSAND, 5);
-        banknotes.setCash(Nominal.TWO_HUNDRED, 8);
-        banknotes.countCash();
         int topUpAmount = banknotes.getTotalAmount();
         //when
         atm.insertNotes(banknotes);
