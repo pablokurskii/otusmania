@@ -4,82 +4,62 @@ import java.util.EnumMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class Atm {
-    private int balance;
+public class Atm implements AtmInterface {
     private final Map<Nominal, Integer> noteCellsBalance;
-    private Banknotes banknotes;
 
-    public Atm() {
-        noteCellsBalance = new EnumMap<>(Nominal.class);
-        for (Nominal nominal : Nominal.values()) {
-            noteCellsBalance.put(nominal, 0);
-        }
+    public Atm(Banknotes insertedBanknotes) {
+        this.noteCellsBalance = new EnumMap<>(Nominal.class);
+        insertNotes(insertedBanknotes);
     }
 
-    public Map<Nominal, Integer> getNoteCellsBalance() {
-        return noteCellsBalance;
+    private void empty(){
+        noteCellsBalance.clear();
     }
 
+    private void reduceBanknotes(Nominal nominal, int quantity){
+        noteCellsBalance.computeIfPresent(nominal, (k, v) -> v - quantity);
+    }
+
+    @Override
     public void insertNotes(Banknotes insertedBanknotes) {
         System.out.println("Banknotes inserted.");
-        //is this a right way of copying??
-        banknotes = insertedBanknotes;
-        noteCellsBalance.putAll(banknotes.getCash());
+        noteCellsBalance.putAll(insertedBanknotes.getCash());
         System.out.println("Processing... Banknotes accepted.");
-        setBalance();
         printBalance();
     }
 
+    @Override
     public int getBalance() {
-        return balance;
+        return noteCellsBalance.entrySet().stream().mapToInt(entry -> entry.getKey().getValue() * entry.getValue()).sum();
     }
 
+    @Override
     public void printBalance() {
         System.out.printf(Locale.US, "Your balance is %,d\n", getBalance());
     }
 
-    private void setBalance() {
-        this.balance = banknotes.getTotalAmount();
-    }
-
-    private void reduceBalance(int amount){
-        balance-=amount;
-    }
-
+    @Override
     public int withdrawAll() {
         System.out.println("Processing withdraw...");
         int amountAvailable = getBalance();
-        reduceBalance(amountAvailable);
+        empty();
         System.out.printf(Locale.US, "Amount of withdraw: %,d. Available amount: 0,00\n", amountAvailable);
         return amountAvailable;
     }
 
+    @Override
     public boolean withdrawAmount(Nominal nominal, int amount) {
-        if (amount > balance) {
+        if (amount > getBalance()) {
             System.out.println("Requested amount exceeded your balance.");
             return false;
         }
 
-        if (nominal == Nominal.ONE_THOUSAND
-                && noteCellsBalance.get(nominal) >= amount / 1000) {
-            System.out.printf("Processing... Take %d banknotes with nominal %s\n", amount / 1000, nominal);
-            reduceBalance(amount);
+        if (noteCellsBalance.get(nominal) >= amount / nominal.getValue()) {
+            System.out.printf("Processing... Take %d banknotes with nominal %s\n", amount / nominal.getValue(), nominal);
+            reduceBanknotes(nominal, amount / nominal.getValue());
             return true;
         }
 
-        if (nominal == Nominal.TWO_HUNDRED
-                && noteCellsBalance.get(nominal) >= amount / 200) {
-            System.out.printf("Processing... Take %d banknotes with nominal %s\n", amount / 200, nominal);
-            reduceBalance(amount);
-            return true;
-        }
-
-        if (nominal == Nominal.FIFTY
-                && noteCellsBalance.get(nominal) >= amount / 50) {
-            System.out.printf("Processing... Take %d banknotes with nominal %s\n", amount / 50, nominal);
-            reduceBalance(amount);
-            return true;
-        }
         System.out.printf("Sorry. No banknotes available of %s nominal for requested amount.",nominal);
         return false;
 

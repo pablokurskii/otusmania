@@ -23,16 +23,7 @@ public class Banknotes {
     }
 
     public void countCash() {
-
-        cash.forEach((nominal, quantity) -> {
-            if (nominal.equals(Nominal.FIFTY)) {
-                totalAmount += 50 * quantity;
-            } else if (nominal.equals(Nominal.TWO_HUNDRED)) {
-                totalAmount += 200 * quantity;
-            } else if (nominal.equals(Nominal.ONE_THOUSAND)) {
-                totalAmount += 1000 * quantity;
-            } else throw new RuntimeException("Wrong nominal");
-        });
+        totalAmount = cash.entrySet().stream().mapToInt(entry -> entry.getKey().getValue() * entry.getValue()).sum();
     }
 
     public int getTotalAmount() {
