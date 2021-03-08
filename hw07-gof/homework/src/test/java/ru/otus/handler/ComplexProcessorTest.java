@@ -5,14 +5,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.otus.model.Message;
 import ru.otus.listener.Listener;
-import ru.otus.processor.Processor;
+import ru.otus.processor.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -93,6 +92,23 @@ class ComplexProcessorTest {
 
         //then
         verify(listener, times(1)).onUpdated(message, message);
+    }
+
+    @Test
+    @DisplayName("2. Сделать процессор, который поменяет местами значения field11 и field12")
+    void changeFieldsTest(){
+
+        List<Processor> processors = List.of(new ProcessorChangePlacesFor11And12Fields());
+
+        var complexProcessor = new ComplexProcessor(processors, (ex) -> {});
+
+        var message = new Message.Builder(1L)
+                .field11("field11")
+                .field12("field12")
+                .build();
+
+        var result = complexProcessor.handle(message);
+        assertThat(result.getField11()).isEqualTo(message.getField12());
     }
 
     private static class TestException extends RuntimeException {
