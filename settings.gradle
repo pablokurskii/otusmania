@@ -4,4 +4,6 @@ include 'hw02-collections'
 include 'hw03-test-framework'
 include 'hw04-gc'
 include 'hw05-byteCodes'
+include 'hw07-gof:homework'
+
 
