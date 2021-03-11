@@ -3,6 +3,8 @@ package ru.otus.handler;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import ru.otus.listener.ListenerMemento;
+import ru.otus.listener.ListenerPrinter;
 import ru.otus.model.Message;
 import ru.otus.listener.Listener;
 import ru.otus.processor.*;
@@ -135,5 +137,36 @@ class ComplexProcessorTest {
         assertThatThrownBy(() -> processor.process(message))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("ProcessorThrowExceptionEvenSecond");
+    }
+
+    @Test
+    @DisplayName("4. Listener старое сообщение - новое")
+    void mementoListenerTest(){
+        /*
+         Сделайте такой тест:
+            - положите сообщение в лисенер
+            - поменяйте сообщение
+            - проверьте, сто в лисенере сообщение не изменилось
+        */
+
+        List<Processor> processors = List.of(new ProcessorChangePlacesFor11And12Fields());
+
+        var complexProcessor = new ComplexProcessor(processors, ex -> System.out.println(ex.getMessage()));
+        var listenerMemento = new ListenerMemento();
+        complexProcessor.addListener(listenerMemento);
+        var listenerPrinter = new ListenerPrinter();
+        complexProcessor.addListener(listenerPrinter);
+
+
+        var original = new Message.Builder(1L)
+                .field11("field11")
+                .field12("field12")
+                .build();
+
+
+        var modified = complexProcessor.handle(original);
+
+        assertThat(original.toString()).isEqualTo(listenerMemento.getLastMessage().toString());
+        assertThat(modified.toString()).isNotEqualTo(listenerMemento.getLastMessage().toString());
     }
 }
