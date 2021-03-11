@@ -6,6 +6,7 @@ import ru.otus.model.Message;
 import ru.otus.model.ObjectForMessage;
 import ru.otus.processor.*;
 
+import java.util.Calendar;
 import java.util.List;
 
 public class HomeWork {
@@ -16,7 +17,8 @@ public class HomeWork {
        2. Сделать процессор, который поменяет местами значения field11 и field12
        3. Сделать процессор, который будет выбрасывать исключение в четную секунду (сделайте тест с гарантированным результатом)
             Секунда должна определяьться во время выполнения.
-       4. Сделать Listener для ведения истории: старое сообщение - новое (подумайте, как сделать, чтобы сообщения не портились)
+       4. Сделать Listener для ведения истории: старое сообщение -
+            новое (подумайте, как сделать, чтобы сообщения не портились)
      */
 
     public static void main(String[] args) {
@@ -26,7 +28,7 @@ public class HomeWork {
          */
 
         var processorsHW = List.of(new ProcessorChangePlacesFor11And12Fields(),
-                new ProcessorThrowExceptionEvenSecond());
+                new ProcessorThrowExceptionEvenSecond(Calendar.getInstance()));
 
         var complexProcessor = new ComplexProcessor(processorsHW, ex -> System.out.println(ex.getMessage()));
         var listenerPrinter = new ListenerPrinter();

@@ -8,10 +8,11 @@ import ru.otus.listener.Listener;
 import ru.otus.processor.*;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -96,11 +97,12 @@ class ComplexProcessorTest {
 
     @Test
     @DisplayName("2. Сделать процессор, который поменяет местами значения field11 и field12")
-    void changeFieldsTest(){
+    void changeFieldsTest() {
 
         List<Processor> processors = List.of(new ProcessorChangePlacesFor11And12Fields());
 
-        var complexProcessor = new ComplexProcessor(processors, (ex) -> {});
+        var complexProcessor = new ComplexProcessor(processors, (ex) -> {
+        });
 
         var message = new Message.Builder(1L)
                 .field11("field11")
@@ -115,5 +117,23 @@ class ComplexProcessorTest {
         public TestException(String message) {
             super(message);
         }
+    }
+
+    @Test
+    @DisplayName("3. выбрасывать исключение в четную секунду")
+    void evenSecondExceptionText() {
+        //given
+        var evenSecond = (new Random().nextInt(60) * 2) % 60;
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.SECOND, evenSecond);
+
+        var processor = new ProcessorThrowExceptionEvenSecond(calendar);
+        var message = new Message.Builder(1L).build();
+
+        //then
+        assertThatThrownBy(() -> processor.process(message))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("ProcessorThrowExceptionEvenSecond");
     }
 }

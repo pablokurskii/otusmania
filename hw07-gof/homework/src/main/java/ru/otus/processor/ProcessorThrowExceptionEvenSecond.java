@@ -6,9 +6,14 @@ import java.util.Calendar;
 
 public class ProcessorThrowExceptionEvenSecond implements Processor {
 
+    private final Calendar rightNow;
+
+    public ProcessorThrowExceptionEvenSecond(Calendar rightNow) {
+        this.rightNow = rightNow;
+    }
+
     @Override
     public Message process(Message message) {
-        Calendar rightNow = Calendar.getInstance();
 
         int secondOfTime = rightNow.get(Calendar.SECOND);
         if (secondOfTime % 2 == 0) throw new RuntimeException("ProcessorThrowExceptionEvenSecond");
